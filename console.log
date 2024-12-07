@@ -1,0 +1,67 @@
+// معالجة تسجيل الدخول
+document.getElementById("loginForm").onsubmit = function(event) {
+    event.preventDefault(); // منع إرسال النموذج بالطريقة الافتراضية
+    var username = event.target.username.value; // الحصول على اسم المستخدم
+    var password = event.target.password.value; // الحصول على كلمة المرور
+
+    console.log("Attempting to log in with username:", username); // طباعة اسم المستخدم
+
+    // إرسال طلب تسجيل الدخول إلى الخادم
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `username=${username}&password=${password}`
+    }).then(response => {
+        console.log("Response status:", response.status); // طباعة حالة الاستجابة
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // تحويل الاستجابة إلى JSON
+    }).then(data => {
+        console.log("Response data:", data); // طباعة البيانات المستلمة
+        document.getElementById("result").innerText = data.message || data.error || "عملية تسجيل الدخول كانت ناجحة!";
+    }).catch(error => {
+        console.error("Error during login:", error); // طباعة الأخطاء في وحدة التحكم
+        document.getElementById("result").innerText = "حدث خطأ: " + error.message; // عرض أي أخطاء
+    });
+};
+
+// معالجة التسجيل
+document.getElementById("signupForm").onsubmit = function(event) {
+    event.preventDefault(); // منع إرسال النموذج بالطريقة الافتراضية
+    var new_username = event.target.new_username.value; // الحصول على اسم المستخدم الجديد
+    var new_password = event.target.new_password.value; // الحصول على كلمة المرور الجديدة
+    var confirm_password = event.target.confirm_password.value; // الحصول على تأكيد كلمة المرور
+
+    console.log("Attempting to sign up with username:", new_username); // طباعة اسم المستخدم الجديد
+
+    // تحقق من تطابق كلمة المرور
+    if (new_password !== confirm_password) {
+        document.getElementById("result").innerText = "كلمة المرور وتأكيد كلمة المرور لا تتطابق!";
+        return;
+    }
+
+    // إرسال طلب التسجيل إلى الخادم
+    fetch('/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `username=${new_username}&password=${new_password}`
+    }).then(response => {
+        console.log("Response status:", response.status); // طباعة حالة الاستجابة
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // تحويل الاستجابة إلى JSON
+    }).then(data => {
+        console.log("Response data:", data); // طباعة البيانات المستلمة
+        document.getElementById("result").innerText = data.message || data.error || "عملية التسجيل كانت ناجحة!";
+    }).catch(error => {
+        console.error("Error during signup:", error); // طباعة الأخطاء في وحدة التحكم
+        document.getElementById("result").innerText = "حدث خطأ: " + error.message; // عرض أي أخطاء
+    });
+};
+```
