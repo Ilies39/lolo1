@@ -1,0 +1,6 @@
+
+```
+Flask
+bcrypt
+requests
+```
