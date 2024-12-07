@@ -14,28 +14,40 @@ setup_logger()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('c.html')
 
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
-    
+
     if not is_valid_username(username) or not is_valid_password(password):
         log_error("Invalid username or password")
         return jsonify({'error': 'Invalid input!'}), 400
 
-    hashed_password = hash_password(password)  # ????? ???? ??????
-    save_user(username, hashed_password)  # ??? ???????? ?? ????? ????????
-    
     session = login_to_linebet(username, password)
-    
+
     if session:
         data = fetch_data(session)
         predicted_result = predict_outcome()
         return jsonify({'data': data, 'prediction': predicted_result})
     else:
+        log_error("Login failed for user: {}".format(username))
         return jsonify({'error': 'Login failed!'}), 401
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form['username']
+    password = request.form['password']
+
+    if not is_valid_username(username) or not is_valid_password(password):
+        log_error("Invalid signup input for user: {}".format(username))
+        return jsonify({'error': 'Invalid input!'}), 400
+
+    hashed_password = hash_password(password)  # تشفير كلمة المرور
+    save_user(username, hashed_password)  # حفظ المستخدم في قاعدة البيانات
+
+    return jsonify({'message': 'Signup successful!'}), 201
 
 if __name__ == '__main__':
     create_database()
